@@ -1,0 +1,210 @@
+///////// Получаем значения из элементов
+// Inputs
+const collateralAlphInput = document.getElementById('collateralAlphInput') as HTMLInputElement
+const borrowAbdInput = document.getElementById('borrowAbdInput') as HTMLInputElement
+// Переменные от Inputs
+let collateralALPH : number = 0
+let borrowABD      : number = 0
+
+// Вставляем значения в элементы
+// Outputs
+const collateralUsdOutput = document.getElementById('collateralUsdOutput') as HTMLParagraphElement
+const collateralRateOutput = document.getElementById('collateralRateOutput') as HTMLParagraphElement
+const conclusion = document.getElementById('conclusion') as HTMLParagraphElement
+const liquidationPrice = document.getElementById('liquidationPrice') as HTMLSpanElement
+const liquidationPriceParagraph = document.getElementById('liquidationPriceParagraph') as HTMLParagraphElement
+
+
+// Переменные с ALPH и ABD в USD
+let collateralUSD  : number = 0
+let borrowUSD      : number = 0
+// Outputs
+const borrowUsdOutput = document.getElementById('borrowUsdOutput') as HTMLParagraphElement
+// Переменная CR
+let CR             : number = 0
+let LP             : number = 0
+
+
+// Selects
+let interestRateSelect = document.getElementById('interestRateSelect') as HTMLSelectElement
+// Вставляем значения в элементы
+const hoursALPHOutput = document.getElementById('hoursALPHOutput') as HTMLSpanElement
+const dayALPHOutput = document.getElementById('dayALPHOutput') as HTMLSpanElement
+const weekALPHOutput = document.getElementById('weekALPHOutput') as HTMLSpanElement
+const monthALPHOutput = document.getElementById('monthALPHOutput') as HTMLSpanElement
+const yearALPHOutput = document.getElementById('yearALPHOutput') as HTMLSpanElement
+
+const hoursUSDOutput = document.getElementById('hoursUSDOutput') as HTMLSpanElement
+const dayUSDOutput = document.getElementById('dayUSDOutput') as HTMLSpanElement
+const weekUSDOutput = document.getElementById('weekUSDOutput') as HTMLSpanElement
+const monthUSDOutput = document.getElementById('monthUSDOutput') as HTMLSpanElement
+const yearUSDOutput = document.getElementById('yearUSDOutput') as HTMLSpanElement
+
+// Елементы для изменения цвета
+const crResultColor = document.getElementById('crResultColor') as HTMLDivElement
+
+
+
+
+// Переменная для цены ALPH
+let alphPrice: number = 0
+// Доступ к элементу с ценой ALPH
+const alphPriceOutput = document.getElementById('alphPriceOutput') as HTMLSpanElement
+// Загрузка цены ALPH
+async function fetchAlephiumPrice() {
+    try {
+        const response = await fetch(
+            'https://api.coingecko.com/api/v3/simple/price?ids=alephium&vs_currencies=usd'
+        );
+        const data = await response.json();
+        
+        // Получаем цену в USD
+        const price = data.alephium.usd;
+
+        // Добавляем в переменную с ценой для рассчета
+        alphPrice = data.alephium.usd;
+        
+        // Обновляем элемент на странице
+        alphPriceOutput.textContent = `${price.toFixed(4)}$`;
+    } catch (error) {
+        console.error('Ошибка при получении цены Alephium:', error);
+        alphPriceOutput.textContent = `Error`;
+    }
+}
+fetchAlephiumPrice(); // Вызываем функцию при загрузке страницы
+setInterval(fetchAlephiumPrice, 120000); // Обновляем цену каждые 60 секунд (опционально)
+
+
+
+
+// Функция для рассчета залога в USD
+function calcCollateralUsd(): void {
+    const collateral: number = Number(collateralAlphInput.value)
+    if (collateral > 0) {
+        collateralUSD = collateral * alphPrice
+        collateralUsdOutput.textContent = `${collateralUSD.toFixed(2)}$`
+    } else {
+        collateralUSD = 0
+        collateralUsdOutput.textContent = `0$`
+    }
+}
+
+// Функция для рассчета займа в USD
+function calcBorrowUsd(): void {
+    const borrow: number = Number(borrowAbdInput.value)
+    if (borrow > 0) {
+        borrowUSD = borrow * 1
+        borrowUsdOutput.textContent = `${borrowUSD.toFixed(2)}$`
+    } else {
+        borrowUSD = 0
+        borrowUsdOutput.textContent = `0$`
+    }
+}
+
+// Функция рассчета CR
+function calcCR(): void {
+    const collateral: number = collateralUSD
+    const borrow: number = borrowUSD
+
+    if (borrow > 0 && collateral > 0) {
+        CR =  (collateral / borrow) * 100
+        collateralRateOutput.textContent = `${CR.toFixed(2)}%`
+        if (CR >= 400) {
+            conclusion.textContent = `Status: ✅ Conservative (CR 400%+)`
+            crResultColor.style.background = `rgb(0, 255, 0, 0.9)`
+            liquidationPriceParagraph.style.color = `rgb(77, 155, 0)`
+        } if (CR < 400 && CR >= 280) {
+            conclusion.textContent = `Status: ⚖️ Moderate (CR 400%-280%)`
+            crResultColor.style.background = `rgb(255, 255, 0, 0.9)`
+            liquidationPriceParagraph.style.color = `rgb(224, 224, 0)`
+        } if (CR < 280 && CR >= 230) {
+            conclusion.textContent = `Status: 🎲 Aggressive (CR 280%-230%)`
+            crResultColor.style.background = `rgb(255, 102, 0, 0.9)`
+            liquidationPriceParagraph.style.color = `rgb(255, 102, 0)`
+        } if (CR < 230 && CR >= 200) {
+            conclusion.textContent = `Status: 🧨 High risk (CR 230%-200%)`
+            crResultColor.style.background = `rgb(236, 47, 0, 0.9)`
+            liquidationPriceParagraph.style.color = `rgb(236, 47, 0)`
+        } if (CR < 200 && CR >= 0) {
+            conclusion.textContent = `Status: 🚩 Liquidation (CR 200%-100%)`
+            crResultColor.style.background = `rgb(214, 0, 0, 0.9)`
+            liquidationPriceParagraph.style.color = `rgb(214, 0, 0)`
+        } if (CR <= 100) {
+            conclusion.textContent = `Status: 🕳️ Liquidated (CR < 100%)`
+            crResultColor.style.background = `rgb(139, 0, 0, 0.5)`
+            liquidationPriceParagraph.style.color = `rgb(139, 0, 0)`
+        }
+    } else {
+        CR =  0
+        collateralRateOutput.textContent = `${CR.toFixed(2)}%`
+        conclusion.textContent = `Status: Loan Status: 0 (CR = 0%)`
+        crResultColor.style.background = `rgba(245, 245, 245, 0.6)`
+    }
+}
+
+// Функция рассчета годовых процентов
+function calcInterestPayment(interestRate: string): any {
+    let currentInterestRate: number = Number(interestRate)
+    
+
+    let hoursUSD : number = (borrowUSD * (currentInterestRate/100)) / 365 / 4
+    let dayUSD : number = (borrowUSD * (currentInterestRate/100)) / 365
+    let weekUSD : number = (borrowUSD * (currentInterestRate/100)) / 365 * 7
+    let monthUSD : number = (borrowUSD * (currentInterestRate/100)) / 12
+    let yearUSD : number = (borrowUSD * (currentInterestRate/100))
+
+    let hoursALPH : number = hoursUSD / alphPrice
+    let dayALPH : number = dayUSD / alphPrice
+    let weekALPH : number = weekUSD / alphPrice
+    let monthALPH : number = monthUSD / alphPrice
+    let yearALPH : number = yearUSD / alphPrice
+
+    hoursALPHOutput.textContent = `${hoursALPH.toFixed(2)}`
+    dayALPHOutput.textContent = `${dayALPH.toFixed(2)}`
+    weekALPHOutput.textContent = `${weekALPH.toFixed(2)}`
+    monthALPHOutput.textContent = `${monthALPH.toFixed(2)}`
+    yearALPHOutput.textContent = `${yearALPH.toFixed(2)}`
+
+    hoursUSDOutput.textContent = `${hoursUSD.toFixed(2)}`
+    dayUSDOutput.textContent = `${dayUSD.toFixed(2)}`
+    weekUSDOutput.textContent = `${weekUSD.toFixed(2)}`
+    monthUSDOutput.textContent = `${monthUSD.toFixed(2)}`
+    yearUSDOutput.textContent = `${yearUSD.toFixed(2)}`
+}
+
+function calcLiquidationPrice(): any {
+    const liquidationPercent: number = 200
+    const calcLP = (liquidationPercent * alphPrice) / CR
+    LP = calcLP
+    if (CR >= 200) {
+        liquidationPrice.textContent = `${LP.toFixed(4)}$`
+    } if (CR < 200) {
+        liquidationPrice.textContent = `Marked for liquidation`
+    } if (CR <=0 ) {
+        liquidationPrice.textContent = `0.00$`
+    }
+    
+}
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await fetchAlephiumPrice();
+    calcCollateralUsd();
+    calcBorrowUsd();
+    calcCR();
+    calcLiquidationPrice();
+    calcInterestPayment(interestRateSelect.value);
+});
+
+collateralAlphInput.addEventListener(`input`, calcCollateralUsd)
+borrowAbdInput.addEventListener(`input`, calcBorrowUsd)
+
+collateralAlphInput.addEventListener(`input`, calcCR)
+borrowAbdInput.addEventListener(`input`, calcCR)
+
+collateralAlphInput.addEventListener(`input`, calcLiquidationPrice)
+borrowAbdInput.addEventListener(`input`, calcLiquidationPrice)
+
+
+borrowAbdInput.addEventListener('input', () => calcInterestPayment(interestRateSelect.value));
+interestRateSelect.addEventListener('input', () => calcInterestPayment(interestRateSelect.value));

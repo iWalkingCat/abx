@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>ABX Loan Calculator</title>
+</head>
+<body>
+
+    <script></script>
+    <header>
+        <div><h1>ABX Loan Calculator</h1></div>
+    </header>
+
+    <main>
+        <div class="collateral-rate-window">
+            <div class="collateral-rate-title">
+                <h2>Collateral Ratio</h2>
+            </div>
+            <div class="collateral-in-alph">
+                <p>Collateral in ALPH</p>
+                <input type="number" id="collateralAlphInput" class="collateral-input-form" style="border: 1px solid rgb(190, 190, 190);">
+            </div>
+            <div class="borrow-in-abd">
+                <p>Borrow ABD</p>
+                <input type="number" id="borrowAbdInput" class="collateral-input-form" style="border: 1px solid rgb(190, 190, 190);">
+            </div>
+            <div class="arrow1 arrow">↓</div>
+            <div class="arrow2 arrow">↓</div>
+            <div class="collateral-in-usd">
+                <p>Collateral in USD</p>
+                <p id="collateralUsdOutput">0$</p>
+            </div>
+            <div class="borrow-in-usd">
+                <p>Borrow in USD</p>
+                <p id="borrowUsdOutput">0$</p>
+            </div>
+            <div class="arrow3 arrow">↓</div>
+            <div class="arrow4 arrow">↓</div>
+            <div class="cr-formula">
+                <math>
+                    <mrow>CR =
+                        <mo>(</mo>
+                            <mfrac>
+                                <mi>CollateralUSD</mi>
+                                <mi>BorrowUSD</mi>
+                            </mfrac>
+                        <mo>)</mo>
+                        <mo>×</mo>
+                        <mn>100 </mn>
+                    </mrow>
+                </math>
+            </div>
+            <div class="arrow5 arrow">↓</div>
+            <div class="cr-result" id="crResultColor">
+                <p>Collateral Ratio</p>
+                <p id="collateralRateOutput">0.00%</p>
+                <p id="conclusion" class="conclusion">Loan Status: 0 (CR = 0%)</p>
+            </div>
+            <div class="liquidation-price">
+                <p id="liquidationPriceParagraph">🧮 Liquidation price: <span id="liquidationPrice">0.00$</span></p>
+            </div>
+            <div class="alph-price">
+                <p>Current ALPH price: <span id="alphPriceOutput">[Loading...]</span></p>
+            </div>
+
+        </div>
+
+        <div class="interest-payment-window">
+            <div class="interest-payment-title">
+                <h2>Interest Payment</h2>
+            </div>
+            <div class="interest-payment-select">
+                <p class="interestRateSelect">
+                    <label for="interestRateSelect">💸 Interest Rate</label>
+                    <select id="interestRateSelect" style="border: 1px solid rgb(190, 190, 190);">
+                        <option value="1">1%</option>
+                        <option value="3">3%</option>
+                        <option value="5">5%</option>
+                        <option value="10">10%</option>
+                        <option value="15">15%</option>
+                        <option value="20">20%</option>
+                        <option value="25">25%</option>
+                        <option value="30">30%</option>
+                    </select>
+                </p>
+            </div>
+            <div class="interest-payment-info">
+                <p>Loan interest is calculated based on borrowed ABDs and deducted from the collateral in ALPH every 6 hours.</p>
+            </div>
+            <div class="interest-payment-calc">
+                <p class="table-name">Loan cost per</p>
+                <table>
+                    <tr>
+                        <td class="time">6hours:</td>
+                        <td class="ALPH"><span id="hoursALPHOutput">0</span> ℵ</td>
+                        <td class="USD"><span id="hoursUSDOutput">0</span> $</td>
+                    </tr>
+                    <tr>
+                        <td class="time">Day:</td>
+                        <td class="ALPH"><span id="dayALPHOutput">0</span> ℵ</td>
+                        <td class="USD"><span id="dayUSDOutput">0</span> $</td>
+                    </tr>
+                    <tr>
+                        <td class="time">Week:</td>
+                        <td class="ALPH"><span id="weekALPHOutput">0</span> ℵ</td>
+                        <td class="USD"><span id="weekUSDOutput">0</span> $</td>
+                    </tr>
+                    <tr>
+                        <td class="time">Month:</td>
+                        <td class="ALPH"><span id="monthALPHOutput">0</span> ℵ</td>
+                        <td class="USD"><span id="monthUSDOutput">0</span> $</td>
+                    </tr>
+                    <tr>
+                        <td class="time">Year:</td>
+                        <td class="ALPH"><span id="yearALPHOutput">0</span> ℵ</td>
+                        <td class="USD"><span id="yearUSDOutput">0</span> $</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    
+    
+    
+    
+    
+    </main>
+
+    <footer>
+        <p>Created by <a href="https://x.com/iWalkingCat" target="_blank">TheWalkingCat</a></p>
+        <p>Support: 169Au4ZhjtujRWPn4PoLXs2qVYWZ8tdnDBXHGUMaLf783</p>
+    </footer>
+
+    <script src="./javascript/script.js"></script>
+</body>
+</html>
