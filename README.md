@@ -1,4 +1,4 @@
-<img width="741" height="517" alt="Screenshot_1" src="https://github.com/user-attachments/assets/8a0a1d0e-f67c-4a89-91bf-8356a47f1b85" />
+<img alt="Screenshot_1" src="https://github.com/user-attachments/assets/8a0a1d0e-f67c-4a89-91bf-8356a47f1b85" />
 
 # ABX Loan Calculator
 This is a simple calculator for loans on [AlphBanX](https://www.alphbanx.com/).
