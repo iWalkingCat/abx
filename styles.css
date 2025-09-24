@@ -309,8 +309,9 @@ footer {
     "arrow5 arrow5"
     "cr-result cr-result"
     "liquidation-price liquidation-price"
+    "liquidation-loss liquidation-loss"
     "alph-price alph-price";
-    grid-template-rows: 60px 50px 18px 50px 14px 50px 24px 90px 28px 36px;
+    grid-template-rows: 60px 50px 18px 50px 14px 50px 24px 90px 22px 22px 36px;
     grid-template-columns: 164px 164px;
     }
 
