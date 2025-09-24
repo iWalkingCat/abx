@@ -299,7 +299,6 @@ footer {
     justify-items: center;
     align-items: center;
     text-align: center;
-    
     grid-template-areas: 
     "collateral-rate-title collateral-rate-title"
     "collateral-in-alph borrow-in-abd"
