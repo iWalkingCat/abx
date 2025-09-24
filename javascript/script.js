@@ -13,6 +13,7 @@ const collateralRateOutput = document.getElementById('collateralRateOutput');
 const conclusion = document.getElementById('conclusion');
 const liquidationPrice = document.getElementById('liquidationPrice');
 const liquidationPriceParagraph = document.getElementById('liquidationPriceParagraph');
+const lossALPH = document.getElementById('lossALPH');
 // Переменные с ALPH и ABD в USD
 let collateralUSD = 0;
 let borrowUSD = 0;
@@ -21,6 +22,7 @@ const borrowUsdOutput = document.getElementById('borrowUsdOutput');
 // Переменная CR
 let CR = 0;
 let LP = 0;
+let LA = 0;
 // Selects
 let interestRateSelect = document.getElementById('interestRateSelect');
 // Вставляем значения в элементы
@@ -156,14 +158,19 @@ function calcLiquidationPrice() {
     const liquidationPercent = 200;
     const calcLP = (liquidationPercent * alphPrice) / CR;
     LP = calcLP;
+    const calcLA = borrowUSD / LP + ((borrowUSD / LP) * 0.10);
+    LA = calcLA;
     if (CR >= 200) {
         liquidationPrice.textContent = `${LP.toFixed(4)}$`;
+        lossALPH.textContent = `~${LA.toFixed(2)}`;
     }
     if (CR < 200) {
         liquidationPrice.textContent = `Marked for liquidation`;
+        lossALPH.textContent = `~${LA.toFixed(2)}`;
     }
     if (CR <= 0) {
         liquidationPrice.textContent = `0.00$`;
+        lossALPH.textContent = `~${LA.toFixed(2)}`;
     }
 }
 document.addEventListener('DOMContentLoaded', async () => {

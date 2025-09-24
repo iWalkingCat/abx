@@ -13,6 +13,7 @@ const collateralRateOutput = document.getElementById('collateralRateOutput') as 
 const conclusion = document.getElementById('conclusion') as HTMLParagraphElement
 const liquidationPrice = document.getElementById('liquidationPrice') as HTMLSpanElement
 const liquidationPriceParagraph = document.getElementById('liquidationPriceParagraph') as HTMLParagraphElement
+const lossALPH = document.getElementById('lossALPH') as HTMLSpanElement
 
 
 // Переменные с ALPH и ABD в USD
@@ -23,6 +24,8 @@ const borrowUsdOutput = document.getElementById('borrowUsdOutput') as HTMLParagr
 // Переменная CR
 let CR             : number = 0
 let LP             : number = 0
+let LA             : number = 0
+
 
 
 // Selects
@@ -176,12 +179,17 @@ function calcLiquidationPrice(): any {
     const liquidationPercent: number = 200
     const calcLP = (liquidationPercent * alphPrice) / CR
     LP = calcLP
+    const calcLA = borrowUSD / LP + ((borrowUSD / LP) * 0.10)
+    LA = calcLA
     if (CR >= 200) {
         liquidationPrice.textContent = `${LP.toFixed(4)}$`
+        lossALPH.textContent = `~${LA.toFixed(2)}`
     } if (CR < 200) {
         liquidationPrice.textContent = `Marked for liquidation`
+        lossALPH.textContent = `~${LA.toFixed(2)}`
     } if (CR <=0 ) {
         liquidationPrice.textContent = `0.00$`
+        lossALPH.textContent = `~${LA.toFixed(2)}`
     }
     
 }

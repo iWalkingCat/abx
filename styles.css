@@ -22,7 +22,7 @@ body {
     ". main ."
     "footer footer footer";
     grid-template-columns: 1fr 700px 1fr;
-    grid-template-rows: 1fr 420px 1fr;
+    grid-template-rows: 1fr 440px 1fr;
 
     height: 100vh;
     font-family: 'Inter', sans-serif;
@@ -106,8 +106,9 @@ select {
     "arrow5 arrow5"
     "cr-result cr-result"
     "liquidation-price liquidation-price"
+    "liquidation-loss liquidation-loss"
     "alph-price alph-price";
-    grid-template-rows: 60px 50px 18px 50px 14px 50px 24px 1fr 22px 36px;
+    grid-template-rows: 60px 50px 18px 50px 14px 50px 24px 1fr 22px 22px 36px;
     grid-template-columns: 164px 164px;
 }
 
@@ -169,6 +170,11 @@ select {
 .liquidation-price {
     grid-area: liquidation-price;
     padding-bottom: 6px;
+}
+.liquidation-loss {
+    grid-area: liquidation-loss;
+    padding-bottom: 6px;
+    color: red;
 }
 #liquidationPriceParagraph {
     transition: color 1s ease;
