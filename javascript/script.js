@@ -1,8 +1,11 @@
-"use strict";
+import { addressFromContractId } from './utils.js';
 ///////// Получаем значения из элементов
 // Inputs
 const collateralAlphInput = document.getElementById('collateralAlphInput');
 const borrowAbdInput = document.getElementById('borrowAbdInput');
+const addressInput = document.getElementById('addressInput');
+const fetchButton = document.getElementById('fetchButton');
+const fetchStatus = document.getElementById('fetchStatus');
 // Переменные от Inputs
 let collateralALPH = 0;
 let borrowABD = 0;
@@ -173,20 +176,218 @@ function calcLiquidationPrice() {
         lossALPH.textContent = `~${LA.toFixed(2)}`;
     }
 }
+// Find address for post parameters
+async function findAddressForParams(userAddress) {
+    try {
+        const response = await fetch('https://lb-fullnode-alephium.notrustverify.ch/contracts/call-contract', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "args": [{
+                        "value": userAddress,
+                        "type": "Address"
+                    }],
+                "group": 0,
+                "address": "tpxjsWJSaUh5i7XzNAsTWMRtD9QvDTV9zmMNeHHS6jQB",
+                "methodIndex": 23
+            })
+        });
+        const data = await response.json();
+        if (data.type === "CallContractSucceeded" && data.returns && data.returns[0]) {
+            // Return the raw hex value from the API response
+            return data.returns[0].value;
+        }
+        throw new Error('Invalid response format');
+    }
+    catch (error) {
+        console.error('Error finding address for params:', error);
+        throw error;
+    }
+}
+// Fetch user's specific borrowed ABD
+async function fetchUserBorrowed(userAddress) {
+    try {
+        // First get the user's position address
+        const contractId = await findAddressForParams(userAddress);
+        const positionAddress = addressFromContractId(contractId);
+        console.log('Contract ID:', contractId, 'Position Address:', positionAddress);
+        // Then fetch the borrowed amount for that position
+        const response = await fetch('https://lb-fullnode-alephium.notrustverify.ch/contracts/call-contract', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "args": [],
+                "group": 0,
+                "address": positionAddress,
+                "methodIndex": 9
+            })
+        });
+        const data = await response.json();
+        if (data.type === "CallContractSucceeded" && data.returns && data.returns[0]) {
+            const borrowedValue = data.returns[0].value;
+            const borrowedABD = parseInt(borrowedValue) / Math.pow(10, 9);
+            return borrowedABD;
+        }
+        return 0; // Return 0 if no borrowed amount found
+    }
+    catch (error) {
+        console.error('Error fetching user borrowed:', error);
+        return 0; // Return 0 on error
+    }
+}
+// Fetch interest rate
+async function fetchInterestRate(positionAddress) {
+    try {
+        const response = await fetch('https://lb-fullnode-alephium.notrustverify.ch/contracts/call-contract', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "args": [],
+                "group": 0,
+                "address": positionAddress,
+                "methodIndex": 5
+            })
+        });
+        const data = await response.json();
+        if (data.type === "CallContractSucceeded" && data.returns && data.returns[0]) {
+            const interestValue = data.returns[0].value;
+            // Convert from basis points to percentage (assuming it's in basis points)
+            const currentInterestRate = parseInt(interestValue); // Store globally
+            return currentInterestRate;
+        }
+        return 5; // Return default rate if fetch fails
+    }
+    catch (error) {
+        console.error('Error fetching interest rate:', error);
+        return 5; // Return default rate on error
+    }
+}
+function showFetchStatus(message, type = 'info') {
+    fetchStatus.textContent = message;
+    fetchStatus.className = `fetch-status ${type}`;
+    // Clear status after 5 seconds
+    setTimeout(() => {
+        fetchStatus.textContent = '';
+        fetchStatus.className = 'fetch-status';
+    }, 5000);
+}
+async function fetchLoanData(address) {
+    if (!address.trim()) {
+        showFetchStatus('Please enter a valid address.', 'error');
+        return;
+    }
+    showFetchStatus('Fetching loan data...', 'info');
+    console.log('Starting fetch for address:', address);
+    try {
+        // Fetch collateral data
+        console.log('Fetching collateral data...');
+        const collateralRes = await fetch(`https://corsproxy.io/?https://api.alphbanx.com/api/loan/${address}`);
+        console.log('Collateral response status:', collateralRes.status);
+        if (collateralRes.status === 404) {
+            showFetchStatus('Address does not have a loan on AlphBanx.', 'error');
+            return;
+        }
+        if (!collateralRes.ok) {
+            console.error('Collateral API error:', collateralRes.status, collateralRes.statusText);
+            throw new Error(`Network error: ${collateralRes.status}`);
+        }
+        const collateralData = await collateralRes.json();
+        console.log('Collateral data:', collateralData);
+        // Get position address
+        console.log('Finding address for params...');
+        const contractId = await findAddressForParams(address);
+        console.log('Contract ID:', contractId);
+        const positionAddress = addressFromContractId(contractId);
+        console.log('Position address:', positionAddress);
+        // Fetch borrowed amount using the new API
+        console.log('Fetching borrowed amount...');
+        const borrowedAmount = await fetchUserBorrowed(address);
+        console.log('Borrowed amount:', borrowedAmount);
+        // Fetch interest rate using position address
+        console.log('Fetching interest rate...');
+        const interestRate = await fetchInterestRate(positionAddress);
+        console.log('Interest rate:', interestRate);
+        if (typeof collateralData.currentCollateral === 'number') {
+            collateralAlphInput.value = collateralData.currentCollateral.toString();
+            borrowAbdInput.value = borrowedAmount.toFixed(2);
+            // Update interest rate select if the fetched rate matches an option
+            const interestRateSelect = document.getElementById('interestRateSelect');
+            const options = Array.from(interestRateSelect.options);
+            const matchingOption = options.find(option => Number(option.value) === interestRate);
+            if (matchingOption) {
+                interestRateSelect.value = matchingOption.value;
+            }
+            // Trigger calculations
+            calcCollateralUsd();
+            calcBorrowUsd();
+            calcCR();
+            calcLiquidationPrice();
+            calcInterestPayment(interestRateSelect.value);
+            showFetchStatus('Loan data fetched successfully!', 'success');
+        }
+        else {
+            console.log('Invalid collateral data:', collateralData);
+            showFetchStatus('No valid collateral data found for this address.', 'error');
+        }
+    }
+    catch (error) {
+        console.error('Error fetching loan data:', error);
+        showFetchStatus(`Failed to fetch loan data: ${error.message}`, 'error');
+    }
+}
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('DOM loaded, checking elements...');
+    console.log('fetchButton:', fetchButton);
+    console.log('addressInput:', addressInput);
+    console.log('fetchStatus:', fetchStatus);
     await fetchAlephiumPrice();
     calcCollateralUsd();
     calcBorrowUsd();
     calcCR();
     calcLiquidationPrice();
     calcInterestPayment(interestRateSelect.value);
+    // Add event listeners after DOM is loaded
+    collateralAlphInput.addEventListener(`input`, calcCollateralUsd);
+    borrowAbdInput.addEventListener(`input`, calcBorrowUsd);
+    collateralAlphInput.addEventListener(`input`, calcCR);
+    borrowAbdInput.addEventListener(`input`, calcCR);
+    collateralAlphInput.addEventListener(`input`, calcLiquidationPrice);
+    borrowAbdInput.addEventListener(`input`, calcLiquidationPrice);
+    borrowAbdInput.addEventListener('input', () => calcInterestPayment(interestRateSelect.value));
+    interestRateSelect.addEventListener('input', () => calcInterestPayment(interestRateSelect.value));
+    // Address fetch functionality
+    fetchButton.addEventListener('click', () => {
+        console.log('Fetch button clicked!');
+        const address = addressInput.value.trim();
+        console.log('Address value:', address);
+        if (address) {
+            console.log('Calling fetchLoanData...');
+            fetchLoanData(address);
+        }
+        else {
+            console.log('No address entered');
+            showFetchStatus('Please enter a wallet address.', 'error');
+        }
+    });
+    // Allow Enter key to trigger fetch
+    addressInput.addEventListener('keypress', (e) => {
+        console.log('Key pressed:', e.key);
+        if (e.key === 'Enter') {
+            console.log('Enter key pressed');
+            const address = addressInput.value.trim();
+            if (address) {
+                fetchLoanData(address);
+            }
+            else {
+                showFetchStatus('Please enter a wallet address.', 'error');
+            }
+        }
+    });
 });
-collateralAlphInput.addEventListener(`input`, calcCollateralUsd);
-borrowAbdInput.addEventListener(`input`, calcBorrowUsd);
-collateralAlphInput.addEventListener(`input`, calcCR);
-borrowAbdInput.addEventListener(`input`, calcCR);
-collateralAlphInput.addEventListener(`input`, calcLiquidationPrice);
-borrowAbdInput.addEventListener(`input`, calcLiquidationPrice);
-borrowAbdInput.addEventListener('input', () => calcInterestPayment(interestRateSelect.value));
-interestRateSelect.addEventListener('input', () => calcInterestPayment(interestRateSelect.value));
 //# sourceMappingURL=script.js.map

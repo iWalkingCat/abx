@@ -17,6 +17,20 @@
     </header>
 
     <main>
+        <div class="address-fetch-window">
+            <div class="address-fetch-title">
+                <h2>Fetch Loan Data</h2>
+            </div>
+            <div class="address-input-section">
+                <p>Enter wallet address to fetch existing loan data:</p>
+                <div class="address-input-container">
+                    <input type="text" id="addressInput" placeholder="Enter wallet address..." class="address-input-form" style="border: 1px solid rgb(190, 190, 190);">
+                    <button id="fetchButton" class="fetch-button">Fetch Data</button>
+                </div>
+                <div id="fetchStatus" class="fetch-status"></div>
+            </div>
+        </div>
+
         <div class="collateral-rate-window">
             <div class="collateral-rate-title">
                 <h2>Collateral Ratio</h2>
@@ -140,6 +154,6 @@
         <p>Support (ALPH): 169Au4ZhjtujRWPn4PoLXs2qVYWZ8tdnDBXHGUMaLf783</p>
     </footer>
 
-    <script src="./javascript/script.js"></script>
+    <script type="module" src="./javascript/script.js"></script>
 </body>
 </html>
