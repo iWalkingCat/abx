@@ -22,7 +22,7 @@ body {
     ". main ."
     "footer footer footer";
     grid-template-columns: 1fr 700px 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto 580px auto;
 
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
@@ -60,7 +60,7 @@ main {
     "address-fetch-window address-fetch-window"
     "collateral-rate-window interest-payment-window";
     grid-template-columns: 6fr 5fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 140px 1fr;
 
     border: 1px solid rgb(190, 190, 190);
     border-radius: 6px;
@@ -92,7 +92,6 @@ input {
 }
 
 .fetch-button {
-    padding: 8px 16px;
     background-color: #007bff;
     color: white;
     border: none;
@@ -136,11 +135,11 @@ input {
 
 .fetch-status {
     margin-top: 8px;
-    padding: 8px;
+    padding: 2px;
     border-radius: 4px;
     font-size: 14px;
     text-align: center;
-    min-height: 20px;
+    min-height: 0px;
 }
 
 .fetch-status.success {
@@ -173,23 +172,25 @@ select {
 
 .address-fetch-window {
     grid-area: address-fetch-window;
-    padding: 15px 20px;
+    padding: 15px 20px 5px 20px;
     border-bottom: 1px solid rgb(190, 190, 190);
 }
 
 .address-fetch-title {
     margin-bottom: 8px;
+    text-align: center;
 }
 
 .address-fetch-title h2 {
-    font-size: 18px;
-    color: #333;
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000;
 }
 
 .address-input-section p {
     margin-bottom: 10px;
     font-size: 14px;
-    color: #666;
+    text-align: center;
 }
 
 .address-input-container {
@@ -200,7 +201,7 @@ select {
 }
 
 .address-input-form {
-    width: 300px;
+    width: 200px;
     padding: 4px 8px;
     text-align: left;
     font-size: 14px;
@@ -211,7 +212,7 @@ select {
 }
 
 .fetch-button {
-    padding: 8px 16px;
+    /* padding: 8px 16px; */
     background-color: #007bff;
     color: white;
     border: none;
@@ -223,6 +224,7 @@ select {
     transition: background-color 0.2s ease;
     min-width: 100px;
     white-space: nowrap;
+    height: 28px;
 }
 
 .fetch-button:hover {
@@ -240,7 +242,7 @@ select {
     border-radius: 4px;
     font-size: 14px;
     text-align: center;
-    min-height: 20px;
+    min-height: 0px;
 }
 
 .fetch-status.success {
@@ -284,7 +286,6 @@ select {
     "alph-price alph-price";
     grid-template-rows: 60px 50px 18px 50px 14px 50px 24px 1fr 22px 22px 36px;
     grid-template-columns: 164px 164px;
-    border-right: 1px solid rgb(190, 190, 190);
 }
 
 .arrow {
@@ -488,10 +489,9 @@ footer {
     "liquidation-price liquidation-price"
     "liquidation-loss liquidation-loss"
     "alph-price alph-price";
-    grid-template-rows: 60px 50px 18px 50px 14px 50px 24px 1fr 22px 22px 36px;
+    grid-template-rows: 60px 50px 18px 50px 14px 50px 24px 1fr 32px 22px 36px;
     grid-template-columns: 164px 164px;
     border-right: none;
-    border-bottom: 1px solid rgb(190, 190, 190);
     }
 
     .address-fetch-window {
@@ -527,5 +527,9 @@ footer {
     justify-items: center;
     align-items: center;
     text-align: center;
+    }
+
+    .liquidation-price {
+        padding-top: 8px;
     }
 }
